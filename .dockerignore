@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info
+*.dist-info
+
+# IDE and Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-*
+
+# Tests and data
+tests/
+test/
+data/
+*.csv
+*.json
+
+# Log files
+*.log
+
+# OS-specific files
+Thumbs.db
+.DS_Store
+
+# Docker related files
+Dockerfile
+docker-compose*
+
+*.env
+local_settings.py
+secrets.txt
+README.md
