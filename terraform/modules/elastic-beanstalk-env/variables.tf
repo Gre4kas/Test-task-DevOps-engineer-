@@ -121,3 +121,18 @@ variable "application_healthcheck_url" {
   description = "URL for the application health check (defaults to health_check_path)"
   default     = null # Will default to health_check_path if null
 }
+
+variable "vpc_id" {
+  type        = string
+  description = "VPC ID where Elastic Beanstalk environment will be created (from network module)"
+}
+
+variable "public_subnet_ids" {
+  type        = list(string)
+  description = "List of public subnet IDs for Elastic Beanstalk environment (from network module)"
+}
+
+variable "elastic_beanstalk_sg_id" {
+  type        = string
+  description = "Security Group ID for Elastic Beanstalk instances (from network module)"
+}

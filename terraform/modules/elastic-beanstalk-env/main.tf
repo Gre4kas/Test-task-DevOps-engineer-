@@ -21,7 +21,7 @@ resource "aws_elastic_beanstalk_environment" "environment" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "EC2KeyName" # Recommended: For SSH Access (Optional, configurable via variable)
-    value     = var.ec2_key_name != "" ? var.ec2_key_name : null # Conditional setting
+    value     = var.ec2_key_name != "" ? var.ec2_key_name : "" # Conditional setting
   }
 
   # -------------------------------------------------------------------------------------------------------------------
@@ -195,6 +195,31 @@ resource "aws_elastic_beanstalk_environment" "environment" {
     namespace = "aws:elasticbeanstalk:managedactions"
     name      = "ManagedActionsEnabled"
     value     = "false" # Keep disabled for now
+  }
+
+  # VPC Configuration -  Use outputs from the network module
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "VPCId"
+    value     = var.vpc_id # From network module output
+  }
+
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "Subnets"
+    value     = join(",", var.public_subnet_ids) # From network module output, comma-separated string
+  }
+
+  setting {
+    namespace = "aws:ec2:vpc"
+    name      = "AssociatePublicIpAddress" # Required for public subnets and internet access
+    value     = "true" # Or "false" if you only want private instances and NAT gateway
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:environment" # Security Groups are set at the environment level in EB
+    name      = "SecurityGroups"
+    value     = var.elastic_beanstalk_sg_id # From network module output
   }
 
   # Tags (Optional, but good practice)
