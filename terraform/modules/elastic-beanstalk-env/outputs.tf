@@ -15,7 +15,10 @@ output "environment_endpoint_url" {
 
 output "database_endpoint" {
   description = "Endpoint of the managed database (if created)"
-  value = aws_elastic_beanstalk_environment.environment.setting[lookup(aws_elastic_beanstalk_environment.environment.setting[*], "name", "Endpoint", "namespace", "aws:rds:dbinstance")].value
+  value = try(
+    tolist([for s in aws_elastic_beanstalk_environment.environment.setting : s.value if s.name == "Endpoint" && s.namespace == "aws:rds:dbinstance"])[0],
+    null
+  )
 }
 
 output "database_username" {
