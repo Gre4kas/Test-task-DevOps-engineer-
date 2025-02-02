@@ -1,14 +1,32 @@
 resource "aws_elastic_beanstalk_environment" "environment" {
   name                = var.environment_name
-  application         = var.application_name # From elastic-beanstalk-app module output
-  solution_stack_name = var.solution_stack_name # e.g., "64bit Amazon Linux 2 v5.6.7 running Docker"
+  application         = var.application_name
+  solution_stack_name = var.solution_stack_name
 
+  # -------------------------------------------------------------------------------------------------------------------
+  # Instance Configuration (aws:autoscaling:launchconfiguration)
+  # -------------------------------------------------------------------------------------------------------------------
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "InstanceType"
     value     = var.instance_type
   }
 
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "IamInstanceProfile"
+    value     = var.instance_profile_arn
+  }
+
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "EC2KeyName" # Recommended: For SSH Access (Optional, configurable via variable)
+    value     = var.ec2_key_name != "" ? var.ec2_key_name : null # Conditional setting
+  }
+
+  # -------------------------------------------------------------------------------------------------------------------
+  # Auto Scaling Group Configuration (aws:autoscaling:asg)
+  # -------------------------------------------------------------------------------------------------------------------
   setting {
     namespace = "aws:autoscaling:asg"
     name      = "MinSize"
@@ -21,28 +39,112 @@ resource "aws_elastic_beanstalk_environment" "environment" {
     value     = var.max_instances
   }
 
+  # -------------------------------------------------------------------------------------------------------------------
+  # Rolling Updates Configuration (aws:autoscaling:updatepolicy:rollingupdate)
+  # -------------------------------------------------------------------------------------------------------------------
+  setting {
+    namespace = "aws:autoscaling:updatepolicy:rollingupdate"
+    name      = "RollingUpdateEnabled" # Recommended: Enable Rolling Updates for smoother deployments
+    value     = var.enable_rolling_updates ? "true" : "false"
+  }
+
+  setting {
+    namespace = "aws:autoscaling:updatepolicy:rollingupdate"
+    name      = "RollingUpdateType" # Recommended: Instance health based rolling updates
+    value     = "Health" # Or "Time", "Immutable" - "Health" is generally a good default
+  }
+
+  # -------------------------------------------------------------------------------------------------------------------
+  # Application Health Check (aws:elasticbeanstalk:application)
+  # -------------------------------------------------------------------------------------------------------------------
+  setting {
+    namespace = "aws:elasticbeanstalk:application"
+    name      = "Application Healthcheck URL" # Recommended: More general application health check
+    # Use var.application_healthcheck_url if provided, otherwise default to "/"
+    value     = var.application_healthcheck_url != null ? var.application_healthcheck_url : "/"
+  }
+
+  # -------------------------------------------------------------------------------------------------------------------
+  # Command Deployment Policy (aws:elasticbeanstalk:command)
+  # -------------------------------------------------------------------------------------------------------------------
+  setting {
+    namespace = "aws:elasticbeanstalk:command"
+    name      = "DeploymentPolicy" # Recommended: Rolling deployments for minimal downtime
+    value     = "Rolling" # Or "AllAtOnce", "BlueGreen", "Immutable"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:command"
+    name      = "BatchSize" # Recommended: Batch size for rolling deployments
+    value     = "30"      # Percentage or number, adjust as needed
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:command"
+    name      = "BatchSizeType" # Recommended: Use percentage for batch size
+    value     = "Percentage" # Or "Fixed"
+  }
+
+  # -------------------------------------------------------------------------------------------------------------------
+  # Environment Service Role (aws:elasticbeanstalk:environment)
+  # -------------------------------------------------------------------------------------------------------------------
   setting {
     namespace = "aws:elasticbeanstalk:environment"
     name      = "ServiceRole"
-    value     = var.service_role_arn # From iam-roles module output
+    value     = var.service_role_arn
+  }
+  
+  # -------------------------------------------------------------------------------------------------------------------
+  # Enhanced Health Reporting (aws:elasticbeanstalk:healthreporting:system)
+  # -------------------------------------------------------------------------------------------------------------------
+  setting {
+    namespace = "aws:elasticbeanstalk:healthreporting:system"
+    name      = "SystemType"
+    value     = "enhanced"
   }
 
   setting {
-    namespace = "aws:elasticbeanstalk:environment:process:default" # For Web Tier
-    name      = "HealthCheckPath"
-    value     = var.health_check_path
+    namespace = "aws:elasticbeanstalk:healthreporting:system"
+    name      = "HealthCheckSuccessThreshold" # Recommended: Adjust health check sensitivity (Optional)
+    value     = "Ok" # Or "Warning", "Degraded", "Severe" - "Ok" is default and reasonable
   }
 
-  # Docker Configuration using Environment Properties
+  # -------------------------------------------------------------------------------------------------------------------
+  # Load Balancer Cross-Zone Load Balancing (aws:elb:loadbalancer)
+  # -------------------------------------------------------------------------------------------------------------------
+  setting {
+    namespace = "aws:elb:loadbalancer"
+    name      = "CrossZone" # Recommended: Enable for High Availability
+    value     = "true"
+  }
+
+  # -------------------------------------------------------------------------------------------------------------------
+  # Load Balancer Connection Draining (aws:elb:policies)
+  # -------------------------------------------------------------------------------------------------------------------
+  setting {
+    namespace = "aws:elb:policies"
+    name      = "ConnectionDrainingEnabled" # Recommended: Enable for graceful deployments
+    value     = "true"
+  }
+
+  setting {
+    namespace = "aws:elb:policies"
+    name      = "ConnectionDrainingTimeout" # Recommended: Timeout for connection draining
+    value     = "30" # Seconds, adjust as needed
+  }
+
+  # -------------------------------------------------------------------------------------------------------------------
+  # Docker Configuration using Environment Properties (aws:elasticbeanstalk:application:environment)
+  # -------------------------------------------------------------------------------------------------------------------
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "EB_DOCKER_IMAGE" # Custom environment variable for Docker image
-    value     = var.docker_image # e.g., from ecr module output + tag
+    name      = "EB_DOCKER_IMAGE"
+    value     = var.docker_image
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "PORT" # Standard environment variable for container port
+    name      = "PORT"
     value     = var.container_port
   }
 
@@ -56,7 +158,7 @@ resource "aws_elastic_beanstalk_environment" "environment" {
     }
   }
 
-  # Managed Database (PostgreSQL in-environment)
+  # Managed Database (PostgreSQL in-environment) - Kept as before
   setting {
     namespace = "aws:rds:dbinstance"
     name      = "DBEngine"
@@ -70,7 +172,7 @@ resource "aws_elastic_beanstalk_environment" "environment" {
   setting {
     namespace = "aws:rds:dbinstance"
     name      = "DBPassword"
-    value     = var.db_password # Consider secrets management for production
+    value     = var.db_password
   }
   setting {
     namespace = "aws:rds:dbinstance"
@@ -88,25 +190,11 @@ resource "aws_elastic_beanstalk_environment" "environment" {
     value     = var.db_engine_version
   }
 
-  # Enhanced Health Reporting (Usually enabled by default, but explicit for clarity)
-  setting {
-    namespace = "aws:elasticbeanstalk:healthreporting:system"
-    name      = "SystemType"
-    value     = "enhanced"
-  }
-
-  # Instance Profile for EC2 instances
-  setting {
-    namespace = "aws:autoscaling:launchconfiguration"
-    name      = "IamInstanceProfile"
-    value     = var.instance_profile_arn # From iam-roles module output
-  }
-
-  # AWS Elastic Beanstalk environment managed platform updates
+  # Explicitly Disable Managed Actions - Keeping this disabled for initial setup
   setting {
     namespace = "aws:elasticbeanstalk:managedactions"
     name      = "ManagedActionsEnabled"
-    value     = "false"
+    value     = "false" # Keep disabled for now
   }
 
   # Tags (Optional, but good practice)

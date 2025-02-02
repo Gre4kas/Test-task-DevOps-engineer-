@@ -42,12 +42,6 @@ variable "instance_profile_arn" {
   description = "ARN of the Elastic Beanstalk EC2 Instance Profile (from iam-roles module)"
 }
 
-variable "health_check_path" {
-  type        = string
-  description = "Path for the Elastic Beanstalk health check"
-  default     = "/" # Adjust to your application's health check endpoint
-}
-
 variable "docker_image" {
   type        = string
   description = "Docker image to deploy (e.g., ECR repository URL + tag)"
@@ -108,4 +102,22 @@ variable "tags" {
   type        = map(string)
   description = "Optional tags to apply to the Elastic Beanstalk environment"
   default     = {}
+}
+
+variable "ec2_key_name" {
+  type        = string
+  description = "EC2 Key Pair to associate with EC2 instances for SSH access (optional)"
+  default     = "" # Empty by default, set to your key pair name if needed
+}
+
+variable "enable_rolling_updates" {
+  type        = bool
+  description = "Enable rolling updates for deployments"
+  default     = true # Recommended for minimal downtime
+}
+
+variable "application_healthcheck_url" {
+  type        = string
+  description = "URL for the application health check (defaults to health_check_path)"
+  default     = null # Will default to health_check_path if null
 }
