@@ -33,14 +33,13 @@ resource "aws_elastic_beanstalk_environment" "environment" {
     value     = var.health_check_path
   }
 
-  # Simplified Docker Configuration - Directly set Docker Image
+  # Docker Configuration using Environment Properties
   setting {
-    namespace = "aws:elasticbeanstalk:environment"
-    name      = "DockerImage"
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "EB_DOCKER_IMAGE" # Custom environment variable for Docker image
     value     = var.docker_image # e.g., from ecr module output + tag
   }
 
-  # Set Container Port using environment property (common practice for simple Docker apps on EB)
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "PORT" # Standard environment variable for container port
@@ -103,32 +102,11 @@ resource "aws_elastic_beanstalk_environment" "environment" {
     value     = var.instance_profile_arn # From iam-roles module output
   }
 
-  # Option to enable Rolling Updates for deployments
-  setting {
-    namespace = "aws:elasticbeanstalk:rollingupdates"
-    name      = "RollingUpdateEnabled"
-    value     = var.enable_rolling_updates ? "true" : "false" # Conditional based on variable
-  }
-
-  # Option to enable Load Balancer access logs (S3 bucket needs to be configured separately)
-  setting {
-    namespace = "aws:elasticbeanstalk:loadbalancer"
-    name      = "AccessLogsEnabled"
-    value     = var.enable_lb_access_logs ? "true" : "false" # Conditional based on variable
-  }
-
   # AWS Elastic Beanstalk environment managed platform updates
   setting {
     namespace = "aws:elasticbeanstalk:managedactions"
     name      = "ManagedActionsEnabled"
-    value     = "true"
-  }
-
-  # This policy is checking to make sure that Elastic Beanstalk environments have enhanced health reporting enabled.
-  setting {
-    namespace = "aws:elasticbeanstalk:healthreporting:system"
-    name      = "HealthStreamingEnabled"
-    value     = "true"
+    value     = "false"
   }
 
   # Tags (Optional, but good practice)

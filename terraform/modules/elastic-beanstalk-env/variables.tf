@@ -104,19 +104,6 @@ variable "db_engine_version" {
   default     = "14.6" # Example, choose a supported version
 }
 
-variable "enable_rolling_updates" {
-  type        = bool
-  description = "Enable rolling updates for deployments"
-  default     = true # Recommended for minimal downtime
-}
-
-variable "enable_lb_access_logs" {
-  type        = bool
-  description = "Enable load balancer access logs"
-  default     = false # Consider enabling for production and configure S3 bucket
-}
-
-
 variable "tags" {
   type        = map(string)
   description = "Optional tags to apply to the Elastic Beanstalk environment"
