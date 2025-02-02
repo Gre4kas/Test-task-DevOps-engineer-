@@ -33,23 +33,19 @@ resource "aws_elastic_beanstalk_environment" "environment" {
     value     = var.health_check_path
   }
 
-  # Docker Configuration (Basic example - you might need Dockerrun.aws.json for more complex setups)
+  # Simplified Docker Configuration - Directly set Docker Image
   setting {
-    namespace = "aws:elasticbeanstalk:container:docker:dockerrunaws"
-    name      = "DockerrunFilename" # Dummy name, we are using direct content
-    value = jsonencode({
-      "AWSEBDockerrunVersion" : "1",
-      "Image" : var.docker_image, # e.g., from ecr module output + tag
-      "Ports" : [
-        {
-          "ContainerPort" : var.container_port,
-          "HostPort"      : var.host_port
-        }
-      ],
-      "Logging": "awslogs-region:us-east-1,awslogs-group:elasticbeanstalk-app" #Example, adjust region/group
-    })
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "DockerImage"
+    value     = var.docker_image # e.g., from ecr module output + tag
   }
 
+  # Set Container Port using environment property (common practice for simple Docker apps on EB)
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "PORT" # Standard environment variable for container port
+    value     = var.container_port
+  }
 
   # Environment Variables for the application
   dynamic "setting" {
