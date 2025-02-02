@@ -15,3 +15,8 @@ variable "ecr_repository_name" {
   description = "Name of the ECR repository to create"
   default     = "my-webapp-repository" # Change this to your desired ECR repository name
 }
+
+variable "docker_image" {
+  type        = string
+  description = "Docker image to deploy (e.g., Docker Hub or ECR image URL)"
+}

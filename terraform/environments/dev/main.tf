@@ -94,14 +94,13 @@ module "eb_env" {
   instance_type         = "t2.micro"
   min_instances         = 1
   max_instances         = 1
-  health_check_path     = "/" # Adjust if needed
 
   service_role_arn    = module.iam_roles.service_role_arn   # From iam_roles module output
   instance_profile_arn = module.iam_roles.instance_profile_arn # From iam_roles module output
 
-  docker_image = "${module.ecr_repo.repository_url}:latest" # From ecr_repo module output, using 'latest' tag initially
-  container_port = 80
-  host_port      = 80
+  docker_image = var.docker_image # From ecr_repo module output, using 'latest' tag initially
+  container_port = 8080
+  host_port      = 8080
 
   environment_variables = {
     "ENVIRONMENT" = "development" # Example environment variable
@@ -120,4 +119,9 @@ module "eb_env" {
   }
 
   depends_on = [module.network] # Explicit dependency on network module
+  
+  # Pass network module outputs as variables to eb_env module
+  vpc_id                 = module.network.vpc_id
+  public_subnet_ids      = module.network.public_subnet_ids
+  elastic_beanstalk_sg_id = module.network.elastic_beanstalk_sg_id
 }
