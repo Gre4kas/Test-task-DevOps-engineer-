@@ -1,0 +1,17 @@
+variable "application_name" {
+  type        = string
+  description = "Name of the Elastic Beanstalk Application"
+  default     = "my-webapp" # Change this to your application name
+}
+
+variable "environment_name" {
+  type        = string
+  description = "Name of the Elastic Beanstalk Environment"
+  default     = "dev-environment" # Change this to your desired environment name
+}
+
+variable "ecr_repository_name" {
+  type        = string
+  description = "Name of the ECR repository to create"
+  default     = "my-webapp-repository" # Change this to your desired ECR repository name
+}
