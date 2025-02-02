@@ -217,7 +217,7 @@ resource "aws_elastic_beanstalk_environment" "environment" {
   }
 
   setting {
-    namespace = "aws:elasticbeanstalk:environment" # Security Groups are set at the environment level in EB
+    namespace = "aws:autoscaling:launchconfiguration" # Security Groups are set at the environment level in EB
     name      = "SecurityGroups"
     value     = var.elastic_beanstalk_sg_id # From network module output
   }
