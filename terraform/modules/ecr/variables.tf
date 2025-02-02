@@ -8,7 +8,7 @@ variable "image_tag_mutability" {
   description = "The image tag mutability setting for the repository (MUTABLE or IMMUTABLE)"
   default     = "MUTABLE" # Good for development, consider IMMUTABLE for production
   validation {
-    condition     = contains(["MUTABLE", "IMMUTABLE"], lower(var.image_tag_mutability))
+    condition     = contains(["MUTABLE", "IMMUTABLE"], var.image_tag_mutability)
     error_message = "Value for image_tag_mutability must be either 'MUTABLE' or 'IMMUTABLE'."
   }
 }
