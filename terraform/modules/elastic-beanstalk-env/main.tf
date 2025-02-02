@@ -121,6 +121,19 @@ resource "aws_elastic_beanstalk_environment" "environment" {
     value     = var.enable_lb_access_logs ? "true" : "false" # Conditional based on variable
   }
 
+  # AWS Elastic Beanstalk environment managed platform updates
+  setting {
+    namespace = "aws:elasticbeanstalk:managedactions"
+    name      = "ManagedActionsEnabled"
+    value     = "true"
+  }
+
+  # This policy is checking to make sure that Elastic Beanstalk environments have enhanced health reporting enabled.
+  setting {
+    namespace = "aws:elasticbeanstalk:healthreporting:system"
+    name      = "HealthStreamingEnabled"
+    value     = "true"
+  }
 
   # Tags (Optional, but good practice)
   tags = var.tags
