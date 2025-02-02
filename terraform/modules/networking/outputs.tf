@@ -1,53 +1,29 @@
-variable "vpc_name" {
-  type        = string
-  description = "Name to be used for the VPC"
-  default     = "eb-app-vpc"
+output "vpc_id" {
+  description = "ID of the VPC"
+  value       = module.vpc.vpc_id
 }
 
-variable "vpc_cidr" {
-  type        = string
-  description = "CIDR block for the VPC"
-  default     = "10.0.0.0/16"
+output "public_subnet_ids" {
+  description = "List of public subnet IDs"
+  value       = module.vpc.public_subnets
 }
 
-variable "public_subnets_cidr" {
-  type        = list(string)
-  description = "List of CIDR blocks for public subnets"
-  default     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"] # Example for 3 AZs
+output "private_subnet_ids" {
+  description = "List of private subnet IDs"
+  value       = module.vpc.private_subnets
 }
 
-variable "private_subnets_cidr" {
-  type        = list(string)
-  description = "List of CIDR blocks for private subnets"
-  default     = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"] # Example for 3 AZs
+output "elastic_beanstalk_sg_id" {
+  description = "ID of the Security Group for Elastic Beanstalk instances"
+  value       = aws_security_group.elastic_beanstalk_sg.id
 }
 
-variable "vpc_tags" {
-  type        = map(string)
-  description = "Tags to apply to the VPC"
-  default     = {}
+output "default_security_group_id" {
+  description = "Default security group ID of the VPC"
+  value = module.vpc.default_security_group_id
 }
 
-variable "public_subnet_tags" {
-  type        = map(string)
-  description = "Tags to apply to public subnets"
-  default     = {}
-}
-
-variable "private_subnet_tags" {
-  type        = map(string)
-  description = "Tags to apply to private subnets"
-  default     = {}
-}
-
-variable "elastic_beanstalk_sg_name" {
-  type        = string
-  description = "Name for the Elastic Beanstalk Security Group"
-  default     = "elastic-beanstalk-sg"
-}
-
-variable "elastic_beanstalk_sg_tags" {
-  type        = map(string)
-  description = "Tags to apply to the Elastic Beanstalk Security Group"
-  default     = {}
+output "natgw_ids" {
+  description = "List of NAT Gateway IDs"
+  value = module.vpc.natgw_ids
 }

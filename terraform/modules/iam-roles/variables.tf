@@ -1,14 +1,17 @@
-output "service_role_arn" {
-  description = "ARN of the Elastic Beanstalk Service Role"
-  value       = aws_iam_role.aws-elasticbeanstalk-service-role.arn
+variable "service_role_name" {
+  type        = string
+  description = "Name for the Elastic Beanstalk Service Role"
+  default     = "aws-elasticbeanstalk-service-role"
 }
 
-output "instance_profile_arn" {
-  description = "ARN of the Elastic Beanstalk EC2 Instance Profile"
-  value       = aws_iam_instance_profile.aws-elasticbeanstalk-ec2-instance-profile.arn
+variable "instance_role_name" {
+  type        = string
+  description = "Name for the Elastic Beanstalk EC2 Instance Role"
+  default     = "aws-elasticbeanstalk-ec2-role"
 }
 
-output "instance_role_arn" {
-  description = "ARN of the Elastic Beanstalk EC2 Instance Role"
-  value       = aws_iam_role.aws-elasticbeanstalk-ec2-role.arn
+variable "instance_profile_name" {
+  type        = string
+  description = "Name for the Elastic Beanstalk EC2 Instance Profile"
+  default     = "aws-elasticbeanstalk-ec2-instance-profile"
 }
