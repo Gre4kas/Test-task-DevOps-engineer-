@@ -71,8 +71,8 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: my-webapp-repository  # Your EB application name
-          # environment_name: dev-webapp-env    # Your EB environment name
+          application_name: devops-project-test-free-tier-eb-env  # Your EB application name
+          environment_name: devops-project-test-free-tier-eb-env    # Your EB environment name
           version_label: ${{ github.sha }}
           region: us-east-1
           deployment_package: deployment_package.zip
