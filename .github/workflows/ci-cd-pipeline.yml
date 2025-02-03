@@ -1,0 +1,77 @@
+name: CI/CD Pipeline for DevOps
+
+on:
+  push:
+    paths:
+      - 'app/**'
+  pull_request:
+    paths:
+      - 'app/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, Tag, and Push Docker Image
+        env:
+          ECR_REPOSITORY: 008971663473.dkr.ecr.us-east-1.amazonaws.com/dev-webapp-ecr-repo
+          IMAGE_NAME: tasktest
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Build the Docker image
+          docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
+          # Tag the image with both IMAGE_TAG and latest
+          docker tag $IMAGE_NAME:$IMAGE_TAG $ECR_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
+          docker tag $IMAGE_NAME:$IMAGE_TAG $ECR_REPOSITORY/$IMAGE_NAME:latest
+
+          # Push both tags to the repository
+          docker push $ECR_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
+          docker push $ECR_REPOSITORY/$IMAGE_NAME:latest
+
+      - name: Create Dockerrun.aws.json
+        run: |
+          cat > Dockerrun.aws.json << 'EOF'
+          {
+            "AWSEBDockerrunVersion": "1",
+            "Image": {
+              "Name": "008971663473.dkr.ecr.us-east-1.amazonaws.com/dev-webapp-ecr-repo/tasktest",
+              "Update": "true"
+            },
+            "Ports": [
+              {
+                "ContainerPort": 8080
+              }
+            ]
+          }
+          EOF
+
+      - name: Zip Dockerrun.aws.json
+        run: |
+          zip deployment_package.zip Dockerrun.aws.json
+
+      - name: Deploy to AWS Elastic Beanstalk
+        if: github.event_name == 'push'
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: my-dev-webapp  # Your EB application name
+          environment_name: dev-webapp-env    # Your EB environment name
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: deployment_package.zip
