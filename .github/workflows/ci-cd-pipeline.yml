@@ -45,7 +45,7 @@ jobs:
           {
             "AWSEBDockerrunVersion": "1",
             "Image": {
-              "Name": "008971663473.dkr.ecr.us-east-1.amazonaws.com/dev-webapp-ecr-repo",
+              "Name": "008971663473.dkr.ecr.us-east-1.amazonaws.com/dev-webapp-ecr-repo:latest",
               "Update": "true"
             },
             "Ports": [
