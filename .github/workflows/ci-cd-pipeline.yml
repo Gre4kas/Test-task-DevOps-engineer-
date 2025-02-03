@@ -36,12 +36,12 @@ jobs:
           docker build -t $IMAGE_NAME:$IMAGE_TAG .
 
           # Tag the image with both IMAGE_TAG and latest
-          docker tag $IMAGE_NAME:$IMAGE_TAG $ECR_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
-          docker tag $IMAGE_NAME:$IMAGE_TAG $ECR_REPOSITORY/$IMAGE_NAME:latest
+          docker tag $IMAGE_NAME:$IMAGE_TAG $ECR_REPOSITORY/:$IMAGE_TAG
+          docker tag $IMAGE_NAME:$IMAGE_TAG $ECR_REPOSITORY/:latest
 
           # Push both tags to the repository
-          docker push $ECR_REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
-          docker push $ECR_REPOSITORY/$IMAGE_NAME:latest
+          docker push $ECR_REPOSITORY/:$IMAGE_TAG
+          docker push $ECR_REPOSITORY/:latest
 
       - name: Create Dockerrun.aws.json
         run: |
@@ -49,7 +49,7 @@ jobs:
           {
             "AWSEBDockerrunVersion": "1",
             "Image": {
-              "Name": "008971663473.dkr.ecr.us-east-1.amazonaws.com/dev-webapp-ecr-repo/tasktest",
+              "Name": "008971663473.dkr.ecr.us-east-1.amazonaws.com/dev-webapp-ecr-repo",
               "Update": "true"
             },
             "Ports": [
