@@ -41,17 +41,22 @@ jobs:
 
       - name: Create Dockerrun.aws.json
         run: |
+          REGISTRY="${{ env.REGISTRY }}"
+          REPOSITORY="${{ env.REPOSITORY }}"
+          IMAGE_TAG="${{ env.IMAGE_TAG }}"
+          IMAGE_URI="$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+
           cat > Dockerrun.aws.json << 'EOF'
           {
             "AWSEBDockerrunVersion": "2",
             "containerDefinitions": [
               {
                 "name": "web-container",
-                "image": "008971663473.dkr.ecr.us-east-1.amazonaws.com/dev-webapp-ecr-repo:latest",
+                "image": "$IMAGE_URI",
                 "portMappings": [
                   {
                     "containerPort": 8080,
-                    "hostPort": 8080
+                    "hostPort": 80
                   }
                 ],
                 "essential": true,
