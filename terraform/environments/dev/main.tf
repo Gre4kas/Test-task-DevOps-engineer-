@@ -110,8 +110,8 @@ module "eb_env" {
 
   docker_image = var.docker_image # From ecr_repo module output, using 'latest' tag initially
 
-  container_port = 8080
-  host_port      = 8080
+  container_port = 80
+  host_port      = 80
 
   environment_variables = {
     "ENVIRONMENT" = "development" # Example environment variable

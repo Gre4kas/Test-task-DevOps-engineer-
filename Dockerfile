@@ -36,7 +36,7 @@ RUN chown -R appuser:appuser /app
 ENV PATH="/opt/venv/bin:$PATH"
 
 # Make port 8080 available to the outside world
-EXPOSE 8080
+EXPOSE 80
 
 # Set environment variables 
 ENV FLASK_APP=app.py
@@ -48,7 +48,7 @@ USER appuser
 
 # The HEALTHCHECK instruction
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-    CMD curl --fail http://localhost:8080/health || exit 1
+    CMD curl --fail http://localhost:80/health || exit 1
 
 # Command to start the application using gunicorn 
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "app:app"]

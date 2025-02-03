@@ -21,4 +21,4 @@ def health_check():
 
 if __name__ == '__main__':
     # Run the app on port 8080 and listen on all network interfaces
-    app.run(host='0.0.0.0', port=8080, debug=False)
+    app.run(host='0.0.0.0', port=80, debug=False)
