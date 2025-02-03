@@ -136,3 +136,9 @@ variable "elastic_beanstalk_sg_id" {
   type        = string
   description = "Security Group ID for Elastic Beanstalk instances (from network module)"
 }
+
+variable "ssl_certificate_arn" {
+  type        = string
+  description = "ARN of the SSL Certificate from AWS Certificate Manager (ACM) for HTTPS"
+  # You MUST provide a valid ACM certificate ARN for HTTPS to work
+}
