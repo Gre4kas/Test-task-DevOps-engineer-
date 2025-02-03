@@ -194,3 +194,9 @@ variable "enable_loadbalancer_logs" {
   type        = bool
   description = "Whether to enable Load Balancer Logging to the S3 bucket."
 }
+
+variable "ecr_repository_name" {
+  type        = string
+  description = "Name of the ECR repository to create"
+  default     = "my-webapp-repository" # Change this to your desired ECR repository name
+}

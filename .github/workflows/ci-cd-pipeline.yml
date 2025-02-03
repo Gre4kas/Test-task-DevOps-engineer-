@@ -43,14 +43,19 @@ jobs:
         run: |
           cat > Dockerrun.aws.json << 'EOF'
           {
-            "AWSEBDockerrunVersion": "1",
-            "Image": {
-              "Name": "008971663473.dkr.ecr.us-east-1.amazonaws.com/dev-webapp-ecr-repo:latest",
-              "Update": "true"
-            },
-            "Ports": [
+            "AWSEBDockerrunVersion": "2",
+            "containerDefinitions": [
               {
-                "ContainerPort": 80
+                "name": "web-container",
+                "image": "008971663473.dkr.ecr.us-east-1.amazonaws.com/dev-webapp-ecr-repo:latest",
+                "portMappings": [
+                  {
+                    "containerPort": 8080,
+                    "hostPort": 8080
+                  }
+                ],
+                "essential": true,
+                "memory": 128
               }
             ]
           }

@@ -23,6 +23,8 @@ module "subnets" {
   nat_gateway_enabled  = true
   nat_instance_enabled = false
 
+  map_public_ip_on_launch = true
+  
   context = module.this.context
 }
 
@@ -69,10 +71,10 @@ module "elastic_beanstalk_environment" {
 
   vpc_id                              = module.vpc.vpc_id
   loadbalancer_subnets                = module.subnets.public_subnet_ids
-  loadbalancer_redirect_http_to_https = true
   application_subnets                 = module.subnets.private_subnet_ids
 
   allow_all_egress = true
+  associate_public_ip_address = true
 
   additional_security_group_rules = [
     {
@@ -119,5 +121,18 @@ data "aws_iam_policy_document" "minimal_s3_permissions" {
       "s3:GetBucketLocation"
     ]
     resources = ["*"]
+  }
+}
+
+module "ecr_repo" {
+  source = "../../modules/ecr"
+
+  repository_name        = var.ecr_repository_name
+  image_tag_mutability   = "MUTABLE" # For dev, mutable tags are often okay
+  scan_on_push           = true
+  tags = {
+    Environment = "Dev"
+    Project     = "WebApp"
+    Terraform   = "true"
   }
 }
