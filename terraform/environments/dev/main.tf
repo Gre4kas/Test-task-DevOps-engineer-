@@ -81,6 +81,14 @@ module "network" {
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
+# Data Source to Fetch ACM Certificate ARN
+# ---------------------------------------------------------------------------------------------------------------------
+data "aws_acm_certificate" "selected" {
+  domain   = var.acm_certificate_domain # Use a variable for the domain name
+  statuses = ["ISSUED"] # Only fetch issued certificates (optional, but good practice)
+}
+
+# ---------------------------------------------------------------------------------------------------------------------
 # Elastic Beanstalk Environment Module
 # ---------------------------------------------------------------------------------------------------------------------
 module "eb_env" {
@@ -89,7 +97,7 @@ module "eb_env" {
   environment_name = var.environment_name
   application_name = module.eb_app.application_name # From eb_app module output
 
-  solution_stack_name = "64bit Amazon Linux 2023 v4.4.3 running Docker" # Ensure this is a current Docker platform version
+  solution_stack_name = "64bit Amazon Linux 2 v4.0.7 running Docker" # Ensure this is a current Docker platform version
 
   instance_type         = "t2.micro"
   min_instances         = 1
@@ -98,7 +106,10 @@ module "eb_env" {
   service_role_arn    = module.iam_roles.service_role_arn   # From iam_roles module output
   instance_profile_arn = module.iam_roles.instance_profile_arn # From iam_roles module output
 
+  ssl_certificate_arn = data.aws_acm_certificate.selected.arn
+
   docker_image = var.docker_image # From ecr_repo module output, using 'latest' tag initially
+
   container_port = 8080
   host_port      = 8080
 
