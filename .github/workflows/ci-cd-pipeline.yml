@@ -41,12 +41,13 @@ jobs:
 
       - name: Create Dockerrun.aws.json
         run: |
+          echo "Start create Dockerrun.aws.json"
           REGISTRY="${{ env.REGISTRY }}"
           REPOSITORY="${{ env.REPOSITORY }}"
           IMAGE_TAG="${{ env.IMAGE_TAG }}"
           IMAGE_URI="$REGISTRY/$REPOSITORY:$IMAGE_TAG"
 
-          echo $IMAGE_URI
+          echo "Generated IMAGE_URI: $IMAGE_URI"
 
           cat > Dockerrun.aws.json << 'EOF'
           {
