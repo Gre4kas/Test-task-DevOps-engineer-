@@ -46,6 +46,8 @@ jobs:
           IMAGE_TAG="${{ env.IMAGE_TAG }}"
           IMAGE_URI="$REGISTRY/$REPOSITORY:$IMAGE_TAG"
 
+          echo $IMAGE_URI
+
           cat > Dockerrun.aws.json << 'EOF'
           {
             "AWSEBDockerrunVersion": "2",
