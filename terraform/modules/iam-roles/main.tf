@@ -16,10 +16,26 @@ resource "aws_iam_role" "aws-elasticbeanstalk-service-role" {
   path = "/"
 }
 
-resource "aws_iam_policy_attachment" "aws-elasticbeanstalk-service-role-policy" {
-  name       = "AWSElasticBeanstalkService-policy-attachment"
+# Replace the managed policy attachment with a custom policy
+resource "aws_iam_policy" "elasticbeanstalk-service-policy" {
+  name        = "${var.service_role_name}-policy-full-access-test" # Updated name to indicate full access and test
+  description = "PERMISSIVE POLICY FOR TESTING ONLY - Grants FULL AWS ACCESS to Elastic Beanstalk Service Role - DO NOT USE IN PRODUCTION" # Clear warning
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = ["*"]       # Grant ALL actions
+        Effect   = "Allow"
+        Resource = ["*"]       # Grant access to ALL resources
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "aws-elasticbeanstalk-service-role-policy-attachment" {
+  name       = "ElasticBeanstalkService-custom-policy-attachment" # Updated name
   roles      = [aws_iam_role.aws-elasticbeanstalk-service-role.name]
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkService"
+  policy_arn = aws_iam_policy.elasticbeanstalk-service-policy.arn # Attach the custom policy
 }
 
 resource "aws_iam_role" "aws-elasticbeanstalk-ec2-role" {
