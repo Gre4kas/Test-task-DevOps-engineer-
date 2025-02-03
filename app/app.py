@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 @app.route('/')
 def home():
     """Simple web page."""
-    return "<h1>Welcome to the Flask App!!!</h1><p>Health check available at /health</p>"
+    return "<h1>Welcome to the Flask App!!</h1><p>Health check available at /health</p>"
 
 @app.route('/health', methods=['GET'])
 def health_check():
