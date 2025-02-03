@@ -72,7 +72,7 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: my-dev-webapp  # Your EB application name
-          environment_name: dev-webapp-env    # Your EB environment name
+          # environment_name: dev-webapp-env    # Your EB environment name
           version_label: ${{ github.sha }}
           region: us-east-1
           deployment_package: deployment_package.zip
