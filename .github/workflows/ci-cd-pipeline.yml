@@ -27,6 +27,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build, Tag, and Push Docker Image
+        id: build-and-push # Add id for step output
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: my-webapp-repository
@@ -39,15 +40,19 @@ jobs:
           # Push both tags to the repository
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
+          # Output variables for next steps
+          echo "registry=$REGISTRY" >> $GITHUB_OUTPUT
+          echo "repository=$REPOSITORY" >> $GITHUB_OUTPUT
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+
       - name: Create Dockerrun.aws.json
         run: |
-          echo "Start create Dockerrun.aws.json"
-          REGISTRY="${{ env.REGISTRY }}"
-          REPOSITORY="${{ env.REPOSITORY }}"
-          IMAGE_TAG="${{ env.IMAGE_TAG }}"
+          REGISTRY="${{ steps.build-and-push.outputs.registry }}" # Get from previous step outputs
+          REPOSITORY="${{ steps.build-and-push.outputs.repository }}" # Get from previous step outputs
+          IMAGE_TAG="${{ steps.build-and-push.outputs.image_tag }}" # Get from previous step outputs
           IMAGE_URI="$REGISTRY/$REPOSITORY:$IMAGE_TAG"
 
-          echo "Generated IMAGE_URI: $IMAGE_URI"
+          echo "Generated IMAGE_URI: $IMAGE_URI" # For debugging
 
           cat > Dockerrun.aws.json << 'EOF'
           {
@@ -81,6 +86,6 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: devops-project-test-free-tier-eb-env  # Your EB application name
           environment_name: devops-project-test-free-tier-eb-env    # Your EB environment name
-          version_label: ${{ github.sha }}
+          version_label: ${{ steps.build-and-push.outputs.image_tag }}
           region: us-east-1
           deployment_package: deployment_package.zip
