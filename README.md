@@ -92,3 +92,19 @@ This diagram illustrates the automated CI/CD pipeline used to build, test, and d
     *   **CodeDeploy:** This stage deploys the newly built Docker image to AWS Elastic Beanstalk.
 
 6. **ECR (Elastic Container Registry):** The built Docker image is pushed to ECR, where it is stored and managed. ECR acts as the registry for the Docker images used by Elastic Beanstalk.
+
+## Application Verification
+
+The following screenshots demonstrate the successful deployment and operation of the web application within the Elastic Beanstalk environment.
+
+**1. Welcome Page:**
+
+![Welcome Page](/images/welcome_to_the_flask_app.jpg)
+
+The screenshot shows the welcome page of the Flask application. It confirms that the application is running and accessible through the Elastic Beanstalk environment's URL: `https://devops-project-test-free-tier-eb-env.eba-kmmz2vfw.us-east-1.elasticbeanstalk.com/`.  The page also indicates the availability of a health check endpoint at `/health`.
+
+**2. Health Check Endpoint:**
+
+![Health Check](/images/status_heathy.jpg)
+
+This screenshot displays the output of the `/health` endpoint.  The JSON response `{"status": "healthy"}` confirms that the application is in a healthy state and responding correctly to requests.
