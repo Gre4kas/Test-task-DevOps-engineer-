@@ -70,5 +70,16 @@ variable "tags" {
 
 variable "family" {
   type        = string
-  description = "The family of the DB parameter group. For PostgreSQL, e.g., 'postgres14'"
+  description = "The family of the DB parameter group (e.g., 'postgres14' or 'mysql8.0')"
+}
+
+variable "db_storage_encrypted" {
+  type        = bool
+  description = "Enable storage encryption at rest for the RDS instance"
+  default     = true
+}
+
+variable "major_engine_version" {
+  type        = string
+  description = "The major engine version of the database (e.g., '14' for PostgreSQL 14 or '8.0' for MySQL 8.0)"
 }
