@@ -67,3 +67,8 @@ variable "tags" {
   description = "Optional tags to apply to the RDS instance"
   default     = {}
 }
+
+variable "family" {
+  type        = string
+  description = "The family of the DB parameter group. For PostgreSQL, e.g., 'postgres14'"
+}

@@ -4,6 +4,7 @@ module "rds_instance" {
 
   identifier = var.db_instance_identifier
 
+  family = var.family
   engine         = "postgres"
   engine_version = var.db_engine_version
   instance_class = var.db_instance_class
