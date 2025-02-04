@@ -74,7 +74,10 @@ module "elastic_beanstalk_environment" {
   application_subnets                 = module.subnets.private_subnet_ids
 
   allow_all_egress = true
-  associate_public_ip_address = true
+  associate_public_ip_address = false
+  loadbalancer_redirect_http_to_https = false
+  loadbalancer_ssl_policy = "ELBSecurityPolicy-2016-08"
+  loadbalancer_certificate_arn = data.aws_acm_certificate.selected.arn
 
   additional_security_group_rules = [
     {
@@ -100,7 +103,6 @@ module "elastic_beanstalk_environment" {
   solution_stack_name = var.solution_stack_name
 
   additional_settings = var.additional_settings
-  env_vars            = var.env_vars
 
   extended_ec2_policy_document = data.aws_iam_policy_document.minimal_s3_permissions.json
   prefer_legacy_ssm_policy     = false
@@ -111,6 +113,8 @@ module "elastic_beanstalk_environment" {
   enable_loadbalancer_logs     = var.enable_loadbalancer_logs
 
   context = module.this.context
+
+  depends_on = [module.rds_db]
 }
 
 data "aws_iam_policy_document" "minimal_s3_permissions" {
@@ -135,4 +139,32 @@ module "ecr_repo" {
     Project     = "WebApp"
     Terraform   = "true"
   }
+}
+
+data "aws_acm_certificate" "selected" {
+  domain   = var.acm_certificate_domain # Use a variable for the domain name
+  statuses = ["ISSUED"] # Only fetch issued certificates (optional, but good practice)
+}
+
+module "rds_db" { # You can name the module instance as 'rds_db' or anything you like
+  source  = "../../modules/rds" # Assuming your 'test' directory is at the same level as 'modules'
+
+  db_instance_identifier = var.db_instance_identifier
+  db_name                 = var.db_name
+  db_username             = var.db_username
+  db_password             = var.db_password
+  db_instance_class       = var.db_instance_class
+  db_allocated_storage    = var.db_allocated_storage
+  db_engine_version       = var.db_engine_version
+  db_multi_az             = var.db_multi_az
+  db_security_group_id    = module.vpc.vpc_default_security_group_id
+  db_subnet_ids           = module.subnets.private_subnet_ids
+  db_deletion_protection  = var.db_deletion_protection
+  db_storage_encrypted = false
+  major_engine_version = var.major_engine_version
+
+  tags                    = var.tags
+
+  # Derive 'family' from 'db_engine_version' - adjust logic if needed for other versions
+  family = "mysql8" 
 }

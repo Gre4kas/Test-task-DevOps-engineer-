@@ -200,3 +200,65 @@ variable "ecr_repository_name" {
   description = "Name of the ECR repository to create"
   default     = "my-webapp-repository" # Change this to your desired ECR repository name
 }
+
+variable "acm_certificate_domain" {
+  type        = string
+  description = "Domain name for which the ACM certificate is issued"
+}
+
+variable "db_instance_identifier" {
+  type        = string
+  description = "Identifier for the RDS instance"
+}
+
+variable "db_name" {
+  type        = string
+  description = "Name of the initial database"
+}
+
+variable "db_username" {
+  type        = string
+  description = "Username for the RDS database"
+}
+
+variable "db_password" {
+  type        = string
+  description = "Password for the RDS database"
+  sensitive   = true
+}
+
+variable "db_instance_class" {
+  type        = string
+  description = "Instance class for the RDS database"
+}
+
+variable "db_allocated_storage" {
+  type        = number
+  description = "Allocated storage (GB) for the RDS database"
+}
+
+variable "db_engine_version" {
+  type        = string
+  description = "Version of PostgreSQL engine"
+}
+
+variable "db_multi_az" {
+  type        = bool
+  description = "Enable Multi-AZ deployment for high availability"
+}
+
+variable "db_deletion_protection" {
+  type        = bool
+  description = "Enable deletion protection for the RDS instance"
+}
+
+variable "db_storage_encrypted" {
+  type        = bool
+  description = "Enable storage encryption at rest for the RDS instance"
+  default     = true # Default value - you'll override in test.tfvars
+}
+
+variable "major_engine_version" {
+  type        = string
+  description = "The major engine version of the database (e.g., '14' for PostgreSQL 14 or '8.0' for MySQL 8.0)"
+}
