@@ -54,7 +54,7 @@ jobs:
 
           echo "Generated IMAGE_URI: $IMAGE_URI" # For debugging
 
-          cat > Dockerrun.aws.json << 'EOF'
+          cat > Dockerrun.aws.json << EOF
           {
             "AWSEBDockerrunVersion": "2",
             "containerDefinitions": [
