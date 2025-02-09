@@ -46,9 +46,5 @@ ENV FLASK_DEBUG=0
 # Switch to the non-root user
 USER appuser
 
-# The HEALTHCHECK instruction
-HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-    CMD curl --fail http://localhost:8080/health || exit 1
-
 # Command to start the application using gunicorn 
 CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
